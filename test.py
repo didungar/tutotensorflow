@@ -44,13 +44,14 @@ if __name__ == '__main__':
 
 	# features Line
 	flp = tf.Variable(tf.random_normal([get_features_column_count(), 1]))
-	fls = tf.Variable(tf.random_normal([get_features_column_count(), 1]))
+	fls = tf.Variable(tf.zeros([1]))#tf.random_normal([get_features_column_count(), 1]))
 	# features prediction
 	fp = tf.matmul(tf_features, flp) + fls
 	# error prediction
 	ep  = tf.reduce_mean(tf.square(fp - tf_targets))
 	# optimiseur
-	train_op = tf.train.GradientDescentOptimizer(learning_rate=0.1).minimize(ep)
+	optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.1)
+	train_op = optimizer.minimize(ep)
 	# accuracy (ratio juste)
 	correct_prediction = tf.equal(tf.round(fp), tf_targets)
 	accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
@@ -58,31 +59,13 @@ if __name__ == '__main__':
 	# Learning :
         sess.run(tf.global_variables_initializer())
 	
-
-        sess.run(tf_features, feed_dict={
-                tf_features: [features[0]],
-                tf_targets: [targets[0]]
-        })
-        print "flp = ", sess.run(flp), "\n"
-        print "fls = ", sess.run(fls), "\n"
-        print "fp = ", sess.run(fp, feed_dict={
-                tf_features: [features[0]],
-                tf_targets: [targets[0]]
-        }), "\n"
-        print "ep = ", sess.run(ep, feed_dict={
-                tf_features: [features[0]],
-                tf_targets: [targets[0]]
-        }), "\n"
-        print "train_op = ", sess.run(train_op, feed_dict={
-                tf_features: [features[0]],
-                tf_targets: [targets[0]]
-        }), "\n"
-        print "correct_prediction = ", sess.run(correct_prediction, feed_dict={
-                tf_features: [features[0]],
-                tf_targets: [targets[0]]
-        }), "\n"
-        print "accuracy = ", sess.run(accuracy, feed_dict={
-                tf_features: [features[0]],
-                tf_targets: [targets[0]]
-        }), "\n"
+	for e in range(25):
+		sess.run(train_op, feed_dict={
+			tf_features: features,
+			tf_targets: targets
+		})
+		print e,"\t","accuracy = ", sess.run(accuracy, feed_dict={
+			tf_features: features,
+			tf_targets: targets
+		})
 
